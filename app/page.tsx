@@ -7,10 +7,8 @@ declare global {
     ethereum: any;
   }
 }
-//TODO: git submodules
 //TODO: use server to prepopulate data,
 //TODO: listen for events
-//TODO: type styles
 export default function Home() {
   if (CONTRACT_ADDRESS == undefined || SEPOLIA_RPC_URL == undefined) {
     throw Error("You forgot to set your environment variables!");

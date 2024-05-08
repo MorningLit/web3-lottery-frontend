@@ -43,10 +43,11 @@ export default function Client({
   }, [CONTRACT_ADDRESS, SEPOLIA_RPC_URL]);
   const handleConnection = async () => {
     if (window.ethereum != null) {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const contract = new Contract(CONTRACT_ADDRESS, abi, signer);
+      //TODO: change network
       try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const contract = new Contract(CONTRACT_ADDRESS, abi, signer);
         await contract.enterRaffle({ value: ethers.parseEther("0.01") });
         toast.success("Successfully entered raffle! 🌟 Good luck! 🍀", {
           position: "top-right",
@@ -60,20 +61,7 @@ export default function Client({
           transition: Bounce,
         });
       } catch (e) {
-        toast.error(
-          `Failed to enter raffle! 🚨 Check console for error message! ✉️`,
-          {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-            transition: Bounce,
-          }
-        );
+        toastError();
       }
     }
   };
@@ -120,6 +108,22 @@ export default function Client({
   );
 }
 
+export const toastError = () => {
+  toast.error(
+    `Failed to enter raffle! 🚨 Check console for error message! ✉️`,
+    {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+    }
+  );
+};
 export interface DaisyUICustomVariables extends CSSProperties {
   "--value": number;
 }

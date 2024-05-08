@@ -1,6 +1,6 @@
 import { BigNumberish, toNumber } from "ethers";
 import React from "react";
-import { DaisyUICustomVariables } from "./Client";
+import { DaisyUICustomVariables, toastError } from "./Client";
 
 const Countdown = ({ lastTimestamp }: { lastTimestamp: BigNumberish }) => {
   const [, rerender] = React.useState({});
@@ -43,6 +43,7 @@ const calculateTimeDifference = (lastTimestamp: BigNumberish) => {
       "Time has passed for too long! We are in the future! The timestamp is too large to be convertable to number!",
       e
     );
+    toastError();
     return { hours: 0, minutes: 0, seconds: 0 };
   }
   const diff = new Date(numericLastTimestamp * 1000 - new Date().getTime());
