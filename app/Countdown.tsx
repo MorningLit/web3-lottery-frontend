@@ -1,5 +1,6 @@
 import { BigNumberish, toNumber } from "ethers";
 import React from "react";
+import { DaisyUICustomVariables } from "./Client";
 
 const Countdown = ({ lastTimestamp }: { lastTimestamp: BigNumberish }) => {
   const [, rerender] = React.useState({});
@@ -14,19 +15,19 @@ const Countdown = ({ lastTimestamp }: { lastTimestamp: BigNumberish }) => {
     <div className="flex gap-5 flex-wrap justify-center">
       <div>
         <span className="countdown font-mono text-4xl">
-          <span style={{ "--value": hours }}></span>
+          <span style={{ "--value": hours } as DaisyUICustomVariables}></span>
         </span>
         hours
       </div>
       <div>
         <span className="countdown font-mono text-4xl">
-          <span style={{ "--value": minutes }}></span>
+          <span style={{ "--value": minutes } as DaisyUICustomVariables}></span>
         </span>
         min
       </div>
       <div>
         <span className="countdown font-mono text-4xl">
-          <span style={{ "--value": seconds }}></span>
+          <span style={{ "--value": seconds } as DaisyUICustomVariables}></span>
         </span>
         sec
       </div>

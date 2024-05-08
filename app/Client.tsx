@@ -2,7 +2,7 @@
 import { Bounce, Slide, ToastContainer, toast } from "react-toastify";
 import { Contract } from "ethers";
 import { ethers, toNumber } from "ethers";
-import React from "react";
+import React, { CSSProperties } from "react";
 import abi from "./contract.json";
 import { BigNumberish } from "ethers";
 import Countdown from "./Countdown";
@@ -93,7 +93,9 @@ export default function Client({
         <div>
           <span>Users entered: </span>
           <span className="countdown">
-            <span style={{ "--value": numUsers }}></span>
+            <span
+              style={{ "--value": numUsers } as DaisyUICustomVariables}
+            ></span>
           </span>
         </div>
         <div>
@@ -116,4 +118,8 @@ export default function Client({
       />
     </>
   );
+}
+
+export interface DaisyUICustomVariables extends CSSProperties {
+  "--value": number;
 }
