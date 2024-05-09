@@ -32,6 +32,13 @@ export default async function Home() {
   return (
     <main className="bg-base-200">
       <div className="hero min-h-screen">
+        <a
+          className="btn btn-ghost text-xl fixed top-6 right-6"
+          href="https://github.com/MorningLit/web3-lottery"
+          target="_blank"
+        >
+          GitHub
+        </a>
         <div className="hero-content text-center">
           <div className="max-w-2xl">
             <h1 className="text-5xl font-bold">Web3 Daily Lottery</h1>

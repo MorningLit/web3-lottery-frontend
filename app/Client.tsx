@@ -31,7 +31,6 @@ export default function Client({
   const [raffleState, setRaffleState] = React.useState(initialRaffleState);
   const handleConnection = async () => {
     if (window.ethereum != null) {
-      //TODO: update details when enter
       try {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const isSepoliaNetwork =
@@ -75,6 +74,7 @@ export default function Client({
         theme: "dark",
         transition: Bounce,
       });
+      setNumUsers((x) => x + 1);
       removeEnteredRaffleListener = event.removeListener;
     });
     let removePickedWinnerListener = () => {};
@@ -90,6 +90,9 @@ export default function Client({
         theme: "dark",
         transition: Bounce,
       });
+      setRecentWinner(playerAddress);
+      setLatestTimestamp(readOnlyContract);
+
       removePickedWinnerListener = event.removeListener;
     });
     return () => {
@@ -98,6 +101,9 @@ export default function Client({
     };
   }, [CONTRACT_ADDRESS, SEPOLIA_RPC_URL]);
   const isRaffleOpen = raffleState === 0;
+  const setLatestTimestamp = async (contract: Contract) => {
+    setLastTimestamp(await contract.getLastTimeStamp());
+  };
   return (
     <>
       {isRaffleOpen ? (
