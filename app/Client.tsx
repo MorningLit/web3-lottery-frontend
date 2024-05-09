@@ -7,6 +7,7 @@ import { BigNumberish } from "ethers";
 import Countdown from "./Countdown";
 import "react-toastify/dist/ReactToastify.css";
 import abi from "./contract.json";
+const SEPOLIA_CHAIN_ID = 11155111;
 
 //TODO: disable button if drawing lottery
 export default function Client({
@@ -28,10 +29,15 @@ export default function Client({
   const [recentWinner, setRecentWinner] = React.useState(initialRecentWinner);
   const handleConnection = async () => {
     if (window.ethereum != null) {
-      //TODO: change network
-      //TODO: update all when enter
+      //TODO: update details when enter
       try {
         const provider = new ethers.BrowserProvider(window.ethereum);
+        const isSepoliaNetwork =
+          (await provider.getNetwork()).chainId === BigInt(SEPOLIA_CHAIN_ID);
+        if (!isSepoliaNetwork) {
+          console.error("You are not on the Sepolia network!");
+          throw new Error();
+        }
         const signer = await provider.getSigner();
         const contract = new Contract(CONTRACT_ADDRESS, abi, signer);
         await contract.enterRaffle({ value: ethers.parseEther("0.01") });
