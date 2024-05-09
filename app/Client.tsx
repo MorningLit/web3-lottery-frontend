@@ -9,24 +9,26 @@ import "react-toastify/dist/ReactToastify.css";
 import abi from "./contract.json";
 const SEPOLIA_CHAIN_ID = 11155111;
 
-//TODO: disable button if drawing lottery
 export default function Client({
   CONTRACT_ADDRESS,
   SEPOLIA_RPC_URL,
   initialNumUsers,
   initialLastTimestamp,
   initialRecentWinner,
+  initialRaffleState,
 }: {
   CONTRACT_ADDRESS: string;
   SEPOLIA_RPC_URL: string;
   initialNumUsers: number;
   initialLastTimestamp: BigNumberish;
   initialRecentWinner: string;
+  initialRaffleState: number;
 }) {
   const [numUsers, setNumUsers] = React.useState(initialNumUsers);
   const [lastTimestamp, setLastTimestamp] =
     React.useState<BigNumberish>(initialLastTimestamp);
   const [recentWinner, setRecentWinner] = React.useState(initialRecentWinner);
+  const [raffleState, setRaffleState] = React.useState(initialRaffleState);
   const handleConnection = async () => {
     if (window.ethereum != null) {
       //TODO: update details when enter
@@ -95,14 +97,21 @@ export default function Client({
       removePickedWinnerListener();
     };
   }, [CONTRACT_ADDRESS, SEPOLIA_RPC_URL]);
+  const isRaffleOpen = raffleState === 0;
   return (
     <>
-      <button
-        className="btn btn-warning btn-outline"
-        onClick={handleConnection}
-      >
-        Enter Raffle!
-      </button>
+      {isRaffleOpen ? (
+        <button
+          className="btn btn-warning btn-outline"
+          onClick={handleConnection}
+        >
+          Enter Raffle!
+        </button>
+      ) : (
+        <button className="btn btn-disabled">
+          Raffle is drawing... Please wait!
+        </button>
+      )}
       <div className="my-6 text-xl">
         Time till next draw:
         <Countdown lastTimestamp={lastTimestamp} />

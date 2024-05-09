@@ -13,10 +13,12 @@ const getInitialBlockchainData = async (contract: Contract) => {
   const numUsers = await contract.getNumPlayers();
   const lastTimestamp = await contract.getLastTimeStamp();
   const recentWinner = await contract.getRecentWinner();
+  const raffleState = await contract.getRaffleState();
   return {
     numUsers: toNumber(numUsers), //NOTE: maybe error here, but very impossible
     lastTimestamp,
     recentWinner,
+    raffleState: toNumber(raffleState),
   };
 };
 export default async function Home() {
@@ -25,7 +27,7 @@ export default async function Home() {
   }
   const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
   const readOnlyContract = new Contract(CONTRACT_ADDRESS, abi, provider);
-  const { numUsers, lastTimestamp, recentWinner } =
+  const { numUsers, lastTimestamp, recentWinner, raffleState } =
     await getInitialBlockchainData(readOnlyContract);
   return (
     <main className="bg-base-200">
@@ -46,6 +48,7 @@ export default async function Home() {
               initialNumUsers={numUsers}
               initialLastTimestamp={lastTimestamp}
               initialRecentWinner={recentWinner}
+              initialRaffleState={raffleState}
             />
             <p className="italic text-sm">
               Running on Ethereum Sepolia Testnet
