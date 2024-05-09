@@ -1,3 +1,4 @@
+"use client";
 import { BigNumberish, toNumber } from "ethers";
 import React from "react";
 import { DaisyUICustomVariables, toastError } from "./Client";

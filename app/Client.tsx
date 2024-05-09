@@ -1,49 +1,35 @@
 "use client";
 import { Bounce, Slide, ToastContainer, toast } from "react-toastify";
 import { Contract } from "ethers";
-import { ethers, toNumber } from "ethers";
+import { ethers } from "ethers";
 import React, { CSSProperties } from "react";
-import abi from "./contract.json";
 import { BigNumberish } from "ethers";
 import Countdown from "./Countdown";
 import "react-toastify/dist/ReactToastify.css";
+import abi from "./contract.json";
 
-const getInitialBlockchainData = async (contract: Contract) => {
-  const numUsers = await contract.getNumPlayers();
-  const lastTimestamp = await contract.getLastTimeStamp();
-  const recentWinner = await contract.getRecentWinner();
-  return {
-    numUsers: toNumber(numUsers),
-    lastTimestamp,
-    recentWinner,
-  };
-};
+//TODO: disable button if drawing lottery
 export default function Client({
-  SEPOLIA_RPC_URL,
   CONTRACT_ADDRESS,
+  SEPOLIA_RPC_URL,
+  initialNumUsers,
+  initialLastTimestamp,
+  initialRecentWinner,
 }: {
-  SEPOLIA_RPC_URL: string;
   CONTRACT_ADDRESS: string;
+  SEPOLIA_RPC_URL: string;
+  initialNumUsers: number;
+  initialLastTimestamp: BigNumberish;
+  initialRecentWinner: string;
 }) {
-  const [numUsers, setNumUsers] = React.useState(0);
-  const [lastTimestamp, setLastTimestamp] = React.useState<BigNumberish>(0);
-  const [recentWinner, setRecentWinner] = React.useState(
-    "0x0000000000000000000000000000000000000000"
-  );
-  React.useEffect(() => {
-    const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
-    const contract = new Contract(CONTRACT_ADDRESS, abi, provider);
-    getInitialBlockchainData(contract).then(
-      ({ numUsers, lastTimestamp, recentWinner }) => {
-        setNumUsers(numUsers);
-        setLastTimestamp(lastTimestamp);
-        setRecentWinner(recentWinner);
-      }
-    );
-  }, [CONTRACT_ADDRESS, SEPOLIA_RPC_URL]);
+  const [numUsers, setNumUsers] = React.useState(initialNumUsers);
+  const [lastTimestamp, setLastTimestamp] =
+    React.useState<BigNumberish>(initialLastTimestamp);
+  const [recentWinner, setRecentWinner] = React.useState(initialRecentWinner);
   const handleConnection = async () => {
     if (window.ethereum != null) {
       //TODO: change network
+      //TODO: update all when enter
       try {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
@@ -65,6 +51,44 @@ export default function Client({
       }
     }
   };
+  React.useEffect(() => {
+    const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+    const readOnlyContract = new Contract(CONTRACT_ADDRESS, abi, provider);
+    let removeEnteredRaffleListener = () => {};
+    readOnlyContract.on("EnteredRaffle", (playerAddress, event) => {
+      toast.info(`${playerAddress} has entered the raffle! ⚔️`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+      removeEnteredRaffleListener = event.removeListener;
+    });
+    let removePickedWinnerListener = () => {};
+    readOnlyContract.on("PickedWinner", (playerAddress, event) => {
+      toast.info(`${playerAddress} has won the raffle! 🌟`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+      removePickedWinnerListener = event.removeListener;
+    });
+    return () => {
+      removeEnteredRaffleListener();
+      removePickedWinnerListener();
+    };
+  }, [CONTRACT_ADDRESS, SEPOLIA_RPC_URL]);
   return (
     <>
       <button

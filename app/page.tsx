@@ -1,4 +1,6 @@
+import { Contract, ethers, toNumber } from "ethers";
 import Client from "./Client";
+import abi from "./contract.json";
 
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
@@ -7,12 +9,24 @@ declare global {
     ethereum: any;
   }
 }
-//TODO: use server to prepopulate data,
-//TODO: listen for events
-export default function Home() {
+const getInitialBlockchainData = async (contract: Contract) => {
+  const numUsers = await contract.getNumPlayers();
+  const lastTimestamp = await contract.getLastTimeStamp();
+  const recentWinner = await contract.getRecentWinner();
+  return {
+    numUsers: toNumber(numUsers), //NOTE: maybe error here, but very impossible
+    lastTimestamp,
+    recentWinner,
+  };
+};
+export default async function Home() {
   if (CONTRACT_ADDRESS == undefined || SEPOLIA_RPC_URL == undefined) {
     throw Error("You forgot to set your environment variables!");
   }
+  const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+  const readOnlyContract = new Contract(CONTRACT_ADDRESS, abi, provider);
+  const { numUsers, lastTimestamp, recentWinner } =
+    await getInitialBlockchainData(readOnlyContract);
   return (
     <main className="bg-base-200">
       <div className="hero min-h-screen">
@@ -29,6 +43,9 @@ export default function Home() {
             <Client
               CONTRACT_ADDRESS={CONTRACT_ADDRESS}
               SEPOLIA_RPC_URL={SEPOLIA_RPC_URL}
+              initialNumUsers={numUsers}
+              initialLastTimestamp={lastTimestamp}
+              initialRecentWinner={recentWinner}
             />
             <p className="italic text-sm">
               Running on Ethereum Sepolia Testnet
@@ -41,3 +58,4 @@ export default function Home() {
     </main>
   );
 }
+export const dynamic = "force-dynamic";
